@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal, KeyboardAvoidingView, Platform } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Category } from '@/types/database';
@@ -74,7 +74,8 @@ export default function AddTransactionScreen() {
   const selectedCategory = categories.find((c) => c.name === category);
 
   return (
-    <ScrollView style={styles.container}>
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <ScrollView style={styles.innerContainer}>
       <View style={styles.header}>
         <Text style={styles.title}>Add Transaction</Text>
       </View>
@@ -159,12 +160,14 @@ export default function AddTransactionScreen() {
           </View>
         </View>
       </Modal>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F9FAFB' },
+  innerContainer: { flex: 1 },
   header: { padding: 24, paddingTop: 60 },
   title: { fontSize: 32, fontWeight: '700', color: '#111827' },
   typeSelector: { flexDirection: 'row', marginHorizontal: 24, marginBottom: 24, gap: 12 },
