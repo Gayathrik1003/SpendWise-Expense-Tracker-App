@@ -48,6 +48,13 @@ export default function CalendarScreen() {
     return transactions.filter((t) => t.transaction_date === dateStr);
   };
 
+  const getDaySummary = (dateStr: string) => {
+    const dayTrans = transactions.filter((t) => t.transaction_date === dateStr);
+    const totalExpense = dayTrans.filter((t) => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+    const totalIncome = dayTrans.filter((t) => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+    return { totalExpense, totalIncome };
+  };
+
   const handleDeleteTransaction = async (transaction: Transaction) => {
     setLoading(true);
     try {
@@ -157,7 +164,18 @@ export default function CalendarScreen() {
           {selectedDateTransactions.length === 0 ? (
             <Text style={styles.noTransactions}>No transactions</Text>
           ) : (
-            selectedDateTransactions.map((t) => (
+            <>
+              <View style={styles.summaryContainer}>
+                <View style={styles.summaryCard}>
+                  <Text style={styles.summaryLabel}>Total Expenses</Text>
+                  <Text style={styles.expenseTotal}>{formatCurrency(getDaySummary(selectedDate).totalExpense)}</Text>
+                </View>
+                <View style={styles.summaryCard}>
+                  <Text style={styles.summaryLabel}>Total Income</Text>
+                  <Text style={styles.incomeTotal}>{formatCurrency(getDaySummary(selectedDate).totalIncome)}</Text>
+                </View>
+              </View>
+              {selectedDateTransactions.map((t) => (
               <View key={t.id} style={styles.transactionCard}>
                 <View style={styles.transactionLeft}>
                   <View style={[styles.transactionIcon, t.type === 'expense' ? styles.expenseIcon : styles.incomeIcon]}>
@@ -183,7 +201,8 @@ export default function CalendarScreen() {
                   </View>
                 </View>
               </View>
-            ))
+            ))}
+            </>
           )}
         </ScrollView>
       )}
@@ -233,7 +252,12 @@ const styles = StyleSheet.create({
   expenseDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#EF4444' },
   incomeDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#10B981' },
   transactionsList: { flex: 1, paddingHorizontal: 24, marginTop: 16 },
-  transactionsTitle: { fontSize: 16, fontWeight: '600', color: '#111827', marginBottom: 12 },
+  transactionsTitle: { fontSize: 16, fontWeight: '600', color: '#111827', marginBottom: 16 },
+  summaryContainer: { flexDirection: 'row', gap: 12, marginBottom: 16 },
+  summaryCard: { flex: 1, backgroundColor: '#FFFFFF', borderRadius: 12, padding: 16, alignItems: 'center' },
+  summaryLabel: { fontSize: 12, fontWeight: '600', color: '#6B7280', marginBottom: 8 },
+  expenseTotal: { fontSize: 20, fontWeight: '700', color: '#EF4444' },
+  incomeTotal: { fontSize: 20, fontWeight: '700', color: '#10B981' },
   noTransactions: { textAlign: 'center', color: '#9CA3AF', fontSize: 14, marginTop: 20 },
   transactionCard: { backgroundColor: '#FFFFFF', borderRadius: 12, padding: 16, marginBottom: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   transactionLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 },
